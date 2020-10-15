@@ -14,10 +14,12 @@ app.get('/', (req, res) => {
 
 
 const MongoClient = require('mongodb').MongoClient;
-const uri = "mongodb+srv://agencyUser:nE0GX8fJ7morkgH0@cluster0.xaiaa.mongodb.net/agencydb?retryWrites=true&w=majority";
+// const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASS}@cluster0.xaiaa.mongodb.net/${process.env.DB_NAME}?retryWrites=true&w=majority`;
+ const uri = "mongodb+srv://agencyUser:nE0GX8fJ7morkgH0@cluster0.xaiaa.mongodb.net/agencydb?retryWrites=true&w=majority";
 const client = new MongoClient(uri, { useNewUrlParser: true,useUnifiedTopology: true  });
 client.connect(err => {
   const collection = client.db("agencydb").collection("agency");
+  const reviweCollection = client.db("agencydb").collection("products");
   console.log("database connected");
 
 
@@ -34,10 +36,35 @@ client.connect(err => {
 });
 
 
+app.get('/order', (req, res) => {
+  collection.find({})
+      .toArray((err, documents) => {
+          res.send(documents);
+      })
 });
 
 
+app.post('/addreview',(req, res)=>{
+  const reviewData = req.body;
+  
+  reviweCollection.insertOne(reviewData)
+  .then(result=>{
+   
+    res.send(result.insertedCount > 0);
 
+  });
+  
+});
+
+
+app.get('/review', (req, res) => {
+  reviweCollection.find({})
+      .toArray((err,documents) => {
+          res.send(documents);
+      })
+});
+
+});
 
 
 app.listen(port)
