@@ -20,6 +20,7 @@ const client = new MongoClient(uri, { useNewUrlParser: true,useUnifiedTopology: 
 client.connect(err => {
   const collection = client.db("agencydb").collection("agency");
   const reviweCollection = client.db("agencydb").collection("products");
+  const adminCollection = client.db("agencydb").collection("adminEmail");
   console.log("database connected");
 
 
@@ -37,7 +38,7 @@ client.connect(err => {
 
 
 app.get('/order', (req, res) => {
-  collection.find({})
+  collection.find({email: req.query.email})
       .toArray((err, documents) => {
           res.send(documents);
       })
@@ -62,6 +63,18 @@ app.get('/review', (req, res) => {
       .toArray((err,documents) => {
           res.send(documents);
       })
+});
+
+app.post('/adminAdd',(req, res)=>{
+  const addAdmin = req.body;
+  
+  adminCollection.insertOne(addAdmin)
+  .then(result=>{
+   
+    res.send(result.insertedCount > 0);
+
+  })
+  
 });
 
 });
